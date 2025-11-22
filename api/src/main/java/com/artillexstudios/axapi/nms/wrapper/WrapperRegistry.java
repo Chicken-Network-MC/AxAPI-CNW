@@ -9,7 +9,6 @@ import java.time.Duration;
 
 public class WrapperRegistry {
     public static final WrapperMapper<ServerPlayerWrapper> SERVER_PLAYER = cachingMapper("server_player", 100);
-    public static final WrapperMapper<ServerWrapper> SERVER = mapper("server");
     public static final WrapperMapper<WorldWrapper> WORLD = mapper("world");
     public static final WrapperMapper<WrappedItemStack> ITEM_STACK = mapper("item_stack");
 

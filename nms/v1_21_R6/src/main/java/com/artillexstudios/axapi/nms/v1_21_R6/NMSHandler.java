@@ -2,16 +2,12 @@ package com.artillexstudios.axapi.nms.v1_21_R6;
 
 import com.artillexstudios.axapi.gui.AnvilInput;
 import com.artillexstudios.axapi.gui.SignInput;
-import com.artillexstudios.axapi.nms.v1_21_R6.entity.PacketEntity;
 import com.artillexstudios.axapi.nms.v1_21_R6.items.data.DataComponentImpl;
 import com.artillexstudios.axapi.nms.v1_21_R6.items.nbt.CompoundTag;
 import com.artillexstudios.axapi.nms.v1_21_R6.loot.LootTable;
-import com.artillexstudios.axapi.nms.v1_21_R6.packet.PacketTransformer;
-import com.artillexstudios.axapi.nms.v1_21_R6.wrapper.WrapperMapperRegistry;
 import com.artillexstudios.axapi.nms.wrapper.ServerPlayerWrapper;
 import com.artillexstudios.axapi.nms.wrapper.WrapperMapper;
 import com.artillexstudios.axapi.nms.wrapper.WrapperRegistry;
-import com.artillexstudios.axapi.packet.FriendlyByteBuf;
 import com.artillexstudios.axapi.serializers.Serializer;
 import com.artillexstudios.axapi.utils.ComponentSerializer;
 import com.google.gson.JsonElement;
@@ -39,7 +35,6 @@ import net.minecraft.world.inventory.ContainerLevelAccess;
 import net.minecraft.world.inventory.MenuType;
 import net.minecraft.world.level.block.entity.BlockEntityType;
 import net.minecraft.world.level.block.entity.SignText;
-import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.craftbukkit.CraftWorld;
@@ -47,7 +42,6 @@ import org.bukkit.craftbukkit.block.data.CraftBlockData;
 import org.bukkit.craftbukkit.entity.CraftPlayer;
 import org.bukkit.craftbukkit.inventory.CraftContainer;
 import org.bukkit.craftbukkit.util.CraftLocation;
-import org.bukkit.entity.EntityType;
 import org.bukkit.entity.HumanEntity;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.Inventory;
@@ -86,11 +80,6 @@ public class NMSHandler implements com.artillexstudios.axapi.nms.NMSHandler {
     public int getProtocolVersionId(Player player) {
         ServerPlayer serverPlayer = ((CraftPlayer) player).getHandle();
         return serverPlayer.connection.connection.protocolVersion;
-    }
-
-    @Override
-    public PacketEntity createEntity(EntityType entityType, Location location) {
-        return new PacketEntity(entityType, location);
     }
 
     @Override
@@ -142,7 +131,7 @@ public class NMSHandler implements com.artillexstudios.axapi.nms.NMSHandler {
 
     @Override
     public ServerPlayerWrapper dummyPlayer() {
-        return WrapperRegistry.SERVER_PLAYER.map(new ServerPlayer(MinecraftServer.getServer(), WrapperMapperRegistry.WORLD.map(Bukkit.getWorlds().getFirst()).asMinecraft(), new GameProfile(UUID.randomUUID(), "dummy"), ClientInformation.createDefault()));
+        return WrapperRegistry.SERVER_PLAYER.map(new ServerPlayer(MinecraftServer.getServer(), null, new GameProfile(UUID.randomUUID(), "dummy"), ClientInformation.createDefault()));
     }
 
     @Override
@@ -171,11 +160,7 @@ public class NMSHandler implements com.artillexstudios.axapi.nms.NMSHandler {
 
     @Override
     public <T extends WrapperMapper<?>> T mapper(String id) {
-        return WrapperMapperRegistry.mapper(id);
+        return null;
     }
 
-    @Override
-    public FriendlyByteBuf newBuf() {
-        return PacketTransformer.newByteBuf();
-    }
 }

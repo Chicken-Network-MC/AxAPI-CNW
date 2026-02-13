@@ -3,6 +3,7 @@ package com.artillexstudios.axapi.nms;
 import com.artillexstudios.axapi.gui.AnvilInput;
 import com.artillexstudios.axapi.gui.SignInput;
 import com.artillexstudios.axapi.items.component.DataComponentImpl;
+import com.artillexstudios.axapi.items.components.DataComponent;
 import com.artillexstudios.axapi.items.nbt.CompoundTag;
 import com.artillexstudios.axapi.loot.LootTable;
 import com.artillexstudios.axapi.nms.wrapper.ServerPlayerWrapper;
@@ -35,4 +36,9 @@ public interface NMSHandler {
 
     <T extends WrapperMapper<?>> T mapper(String id);
 
+    FriendlyByteBuf newBuf();
+
+    default <T extends DataComponent<?>> T getDataComponent(String id) {
+        return null;
+    }
 }

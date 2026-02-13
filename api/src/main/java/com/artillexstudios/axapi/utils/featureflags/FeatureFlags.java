@@ -143,6 +143,18 @@ public final class FeatureFlags {
      * Can be controlled with the system property: %pluginName%enablePacketListeners
      */
     public static final BooleanFlag ENABLE_PACKET_LISTENERS = new BooleanFlag(false);
+    /**
+     * The size of the cache for player wrappers.
+     * <p>
+     * Can be controlled with the system property: %pluginName%serverPlayerCacheSize
+     */
+    public static final IntegerFlag SERVER_PLAYER_CACHE_SIZE = new IntegerFlag(1500);
+    /**
+     * The size of the cache for parsed hologram lines.
+     * <p>
+     * Can be controlled with the system property: %pluginName%hologramParsedLineCache
+     */
+    public static final IntegerFlag HOLOGRAM_PARSED_LINE_CACHE = new IntegerFlag(2000);
 
     public static void refresh(AxPlugin plugin) {
         PACKET_ENTITY_TRACKER_ENABLED.refresh(plugin.getName() + "enableEntityTracker");
@@ -166,5 +178,7 @@ public final class FeatureFlags {
         LISTEN_TO_RIDE_PACKET.refresh(plugin.getName() + "listenToRidePacket");
         ASYNC_UTILS_POOL_SIZE.refresh(plugin.getName() + "asyncUtilsPoolSize");
         ENABLE_PACKET_LISTENERS.refresh(plugin.getName() + "enablePacketListeners");
+        SERVER_PLAYER_CACHE_SIZE.refresh(plugin.getName() + "serverPlayerCacheSize");
+        HOLOGRAM_PARSED_LINE_CACHE.refresh(plugin.getName() + "hologramParsedLineCache");
     }
 }

@@ -2,14 +2,17 @@ package com.artillexstudios.axapi.utils;
 
 import com.artillexstudios.axapi.nms.NMSHandlers;
 import com.artillexstudios.axapi.reflection.FastMethodInvoker;
+import com.artillexstudios.axapi.utils.logging.LogUtils;
 import it.unimi.dsi.fastutil.ints.Int2ObjectArrayMap;
 import org.bukkit.entity.Player;
 
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
+import java.util.function.BooleanSupplier;
 
 public enum Version {
+    v1_21_8(774, "v1_21_R7", Collections.singletonList("1.21.11")),
     v1_21_7(773, "v1_21_R6", Arrays.asList("1.21.9", "1.21.10")),
     v1_21_6(772, "v1_21_R5", Arrays.asList("1.21.7", "1.21.8")),
     v1_21_5(771, "v1_21_R5", Collections.singletonList("1.21.6")),
@@ -38,34 +41,55 @@ public enum Version {
     private static int protocolVersion;
 
     static {
-        final FastMethodInvoker methodInvoker = FastMethodInvoker.create("net.minecraft.SharedConstants", "c");
-        final int protocolVersion = methodInvoker.invoke(null);
+        final FastMethodInvoker methodInvoker = ExceptionUtils.orElse(
+                () -> FastMethodInvoker.createSilently("net.minecraft.SharedConstants", "c"),
+                () -> FastMethodInvoker.createSilently("net.minecraft.SharedConstants", "getProtocolVersion"),
+                exception -> {
+            LogUtils.error("Failed to fetch the version information!");
+            return null;
+        });
 
-        for (Version value : values()) {
-            versionMap.put(value.protocolId, value);
-
-            if (value.protocolId == protocolVersion) {
-                Version.serverVersion = value;
-                break;
-            }
-        }
-
-        if (Version.serverVersion == null) {
+        if (methodInvoker == null) {
             Version.serverVersion = UNKNOWN;
-        }
+        } else {
+            final int protocolVersion = methodInvoker.invoke(null);
 
-        Version.protocolVersion = protocolVersion;
+            for (Version value : values()) {
+                if (!value.supplier.getAsBoolean()) {
+                    continue;
+                }
+
+                versionMap.put(value.protocolId, value);
+
+                if (value.protocolId == protocolVersion) {
+                    Version.serverVersion = value;
+                    break;
+                }
+            }
+
+            if (Version.serverVersion == null) {
+                Version.serverVersion = UNKNOWN;
+            }
+
+            Version.protocolVersion = protocolVersion;
+        }
     }
 
 
     private final List<String> versions;
     private final int protocolId;
     private final String nmsVersion;
+    private final BooleanSupplier supplier; // If the version is allowed in this environment
 
-    Version(int protocolId, String nmsVersion, List<String> versions) {
+    Version(int protocolId, String nmsVersion, List<String> versions, BooleanSupplier supplier) {
         this.protocolId = protocolId;
         this.versions = versions;
         this.nmsVersion = nmsVersion;
+        this.supplier = supplier;
+    }
+
+    Version(int protocolId, String nmsVersion, List<String> versions) {
+        this(protocolId, nmsVersion, versions, () -> true);
     }
 
     public static Version getPlayerVersion(Player player) {
